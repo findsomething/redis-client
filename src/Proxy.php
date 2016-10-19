@@ -12,12 +12,24 @@ class Proxy
     protected $maxReconnectTimes = 3;
     protected $storage;
     protected $logger;
-    protected $sleep;
+    protected $sleep = true;
+    protected $sleepTime = 1;
 
-    public function __construct(Client $storage, $sleep = true)
+    public function __construct(Client $storage)
     {
         $this->storage = $storage;
+    }
+
+    public function setSleep($sleep)
+    {
         $this->sleep = $sleep;
+        return $this;
+    }
+
+    public function setSleepTime($sleepTime)
+    {
+        $this->sleepTime = $sleepTime;
+        return $this;
     }
 
     public function getStorage()
@@ -54,7 +66,7 @@ class Proxy
 
             if ($reconnectTimes > 1) {
                 if ($this->sleep) {
-                    sleep(1);
+                    sleep($this->sleepTime);
                 }
             }
 
