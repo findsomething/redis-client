@@ -9,25 +9,27 @@ namespace FSth\Redis;
 
 class Proxy
 {
-    private $maxReconnectTimes = 3;
+    protected $maxReconnectTimes = 3;
     protected $storage;
     protected $logger;
-    
-    public function __construct(Client $storage)
+    protected $sleep;
+
+    public function __construct(Client $storage, $sleep = true)
     {
         $this->storage = $storage;
+        $this->sleep = $sleep;
     }
-    
+
     public function getStorage()
     {
         return $this->storage;
     }
-    
+
     public function setLogger($logger)
     {
         $this->logger = $logger;
     }
-    
+
     public function __call($method, $args)
     {
         $ok = true;
@@ -51,7 +53,9 @@ class Proxy
             }
 
             if ($reconnectTimes > 1) {
-                sleep(1);
+                if ($this->sleep) {
+                    sleep(1);
+                }
             }
 
         } while ($ok === false && $reconnectTimes < $this->maxReconnectTimes);
