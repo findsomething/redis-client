@@ -1,0 +1,15 @@
+{
+  "name": "fsth/redis-client",
+  "description": "redis client.",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "FSth\\Redis\\": "src/",
+      "FSth\\Redis\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "psr/log": ">=1.0.0"
+  }
+}
