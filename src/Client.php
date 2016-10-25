@@ -13,7 +13,7 @@ class Client
     private $port;
     private $timeout;
     private $redis;
-    
+
     public function __construct($host, $port, $timeout = 10)
     {
         $this->host = $host;
@@ -29,7 +29,10 @@ class Client
     public function connect()
     {
         $this->redis = new \Redis();
-        $this->redis->connect($this->host, $this->port, $this->timeout);
+        $result = $this->redis->connect($this->host, $this->port, $this->timeout);
+        if (!$result) {
+            throw new \RedisException("connect redis failed");
+        }
         $this->redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_NONE);
     }
 
@@ -54,7 +57,7 @@ class Client
 
     public function __call($method, $args)
     {
-        if ($this->checkValid()){
+        if ($this->checkValid()) {
             return call_user_func_array(array($this->redis, $method), $args);
         }
         throw new \RedisException("execute {$method} failed");
