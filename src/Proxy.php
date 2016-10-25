@@ -48,13 +48,13 @@ class Proxy
         $reconnectTimes = 0;
 
         do {
-            if ($ok == false) {
-                $reconnectTimes++;
-                $this->storage->reconnect();
-                $ok = true;
-            }
-
             try {
+                if ($ok == false) {
+                    $reconnectTimes++;
+                    $this->storage->reconnect();
+                    $ok = true;
+                }
+
                 return call_user_func_array(array($this->storage, $method), $args);
             } catch (\RedisException $e) {
                 $ok = false;
