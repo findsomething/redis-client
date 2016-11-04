@@ -19,6 +19,7 @@ class Client
         $this->host = $host;
         $this->port = $port;
         $this->timeout = $timeout;
+        $this->connect();
     }
 
     public function __destruct()
