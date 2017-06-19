@@ -51,6 +51,7 @@ class Client
         } catch (\Exception $e) {
 
         } finally {
+            unset($this->redis);
             $this->redis = null;
         }
     }
