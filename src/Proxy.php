@@ -14,10 +14,18 @@ class Proxy
     protected $logger;
     protected $sleep = true;
     protected $sleepTime = 1;
+    protected $free;
 
-    public function __construct(Client $storage)
+    /**
+     * Proxy constructor.
+     * @param Client $storage
+     * @param bool $free
+     *  true/false whether free connection each time
+     */
+    public function __construct(Client $storage, $free = false)
     {
         $this->storage = $storage;
+        $this->free = $free;
     }
 
     public function setSleep($sleep)
@@ -42,6 +50,11 @@ class Proxy
         $this->logger = $logger;
     }
 
+    public function setFreeNow($free)
+    {
+        $this->free = $free;
+    }
+
     public function __call($method, $args)
     {
         $ok = true;
@@ -49,13 +62,23 @@ class Proxy
 
         do {
             try {
+                if ($this->free) {
+                    $this->storage->connect();
+                }
+
                 if ($ok == false) {
                     $reconnectTimes++;
                     $this->storage->reconnect();
                     $ok = true;
                 }
 
-                return call_user_func_array(array($this->storage, $method), $args);
+                $result = call_user_func_array(array($this->storage, $method), $args);
+
+                if ($this->free) {
+                    $this->storage->disconnect();
+                }
+
+                return $result;
             } catch (\RedisException $e) {
                 $ok = false;
                 $this->logger->notice("redis execute error", array(
