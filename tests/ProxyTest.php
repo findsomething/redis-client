@@ -23,6 +23,7 @@ class ProxyTest extends \PHPUnit_Framework_TestCase
         $this->client = new Client($this->host, $this->port);
         $this->proxy = new Proxy($this->client);
         $this->proxy->setLogger(new FakeLogger());
+        $this->proxy->setSleepTime(500);
     }
 
     public function testSet()

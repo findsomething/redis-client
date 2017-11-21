@@ -9,11 +9,13 @@ namespace FSth\Redis;
 
 class Proxy
 {
+    const MIN_MICROSECOND = 10;
+
     protected $maxReconnectTimes = 3;
     protected $storage;
     protected $logger;
-    protected $sleep = true;
-    protected $sleepTime = 1;
+    protected $sleep;
+    protected $sleepTime;
     protected $free;
 
     /**
@@ -26,6 +28,8 @@ class Proxy
     {
         $this->storage = $storage;
         $this->free = $free;
+        $this->sleep = true;
+        $this->sleepTime = self::MIN_MICROSECOND;
     }
 
     public function setSleep($sleep)
@@ -36,7 +40,7 @@ class Proxy
 
     public function setSleepTime($sleepTime)
     {
-        $this->sleepTime = $sleepTime;
+        $this->sleepTime = max($sleepTime, self::MIN_MICROSECOND);
         return $this;
     }
 
@@ -83,7 +87,7 @@ class Proxy
             } catch (\RedisException $e) {
                 $exception = $e;
                 $ok = false;
-                if ($reconnectTimes >= 1) {
+                if ($reconnectTimes > 1) {
                     $this->logger->notice("redis execute error", array(
                         'method' => $method,
                         'args' => $args,
@@ -91,9 +95,10 @@ class Proxy
                 }
             }
 
+
             if ($reconnectTimes > 1) {
                 if ($this->sleep) {
-                    sleep($this->sleepTime);
+                    usleep($this->getRandMicroSecond());
                 }
             }
 
@@ -104,5 +109,10 @@ class Proxy
             'args' => $args,
         ));
         throw $exception;
+    }
+
+    private function getRandMicroSecond()
+    {
+        return rand(self::MIN_MICROSECOND, $this->sleepTime) * 1000;
     }
 }
