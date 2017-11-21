@@ -87,14 +87,7 @@ class Proxy
             } catch (\RedisException $e) {
                 $exception = $e;
                 $ok = false;
-                if ($reconnectTimes > 1) {
-                    $this->logger->notice("redis execute error", array(
-                        'method' => $method,
-                        'args' => $args,
-                    ));
-                }
             }
-
 
             if ($reconnectTimes > 1) {
                 if ($this->sleep) {
